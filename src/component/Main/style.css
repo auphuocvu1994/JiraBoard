@@ -1,0 +1,6 @@
+main.wrap-content {
+    height: calc(100vh - 58px);
+    background-color: #53c26c;
+    display: flex;
+    padding: 25px;
+}
