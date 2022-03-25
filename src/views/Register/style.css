@@ -1,0 +1,117 @@
+.wrapper{
+    height: 100vh;
+    background: #01d28e;
+}
+
+.form-register {
+    width: 400px;
+    background: white;
+    text-align: center;
+    padding: 20px 40px;
+    border-radius: 15px;
+    margin: 0 auto;
+    top: 50%;
+    position: relative;
+    transform: translateY(-50%);
+}
+
+.form-block {
+    position: relative;
+    border-bottom: 2px solid #adadad;
+    border-bottom: 2px solid #adadad;
+    margin: 40px 0;
+}
+
+input.form-block__input {
+    width: 100%;
+    border: none;
+    outline: none;
+    height: 40px;
+    font-size: 16px;
+}
+
+label.form-block__input--title {
+    position: absolute;
+    top: 0;
+    left: 0;
+    transform: translate(10px,10px);
+    transition: all 0.5s ease-in-out;
+    font-size: 16px;
+    pointer-events: none;
+    color: #adadad;
+}
+
+input.form-block__input:focus + label.form-block__input--title {
+    top: -20px;
+    left: -10px;
+    color: #adadad;
+    font-size: 14px;
+}
+input.form-block__input.show + label.form-block__input--title {
+    top: -20px;
+    left: -10px;
+    color: #adadad;
+    font-size: 14px;
+}
+
+input.form-block__input:focus + label.form-block__input--border:after {
+    top: -15px;
+    left: -8px;
+    color: #adadad;
+}
+
+label.form-block__input--border:after {
+    position: absolute;
+    bottom: -2px;
+    left: 0;
+    height: 2px;
+    width: 0;
+    content: '';
+    background: #2691d9;
+    transition: all 0.3s ease;
+}
+
+input.form-block__input:focus ~ label.form-block__input--border:after{
+    width: 100%;
+}
+
+button.btn-login {
+    background: #2691d9;
+    border-radius: 25px;
+    font-size: 18px;
+    color: #e9f4fb;
+    font-weight: 700;
+    width: 100%;
+    border: none;
+    outline: none;
+    height: 50px;
+    margin: 20px 0;
+    cursor: pointer;
+}
+
+.more-action span{
+    font-size: 16px;
+    color: #666666;
+}
+
+.more-action a {
+    cursor: pointer;
+    font-size: 16px;
+    color: #2691d9;
+    text-decoration: none;
+    transition: all 0.5 ease;
+}
+.more-action a:hover {
+    text-decoration: underline;
+}
+
+.form-block.error small.lblError {
+    display: block;
+}
+.form-block small.lblError {
+    position: absolute;
+    left: 0;
+    bottom: -30px;
+    color: red;
+    display: none;
+}
