@@ -7,15 +7,15 @@ import { Routes, Route, Link, Navigate } from "react-router-dom";
 import Home from './views/Home/Home';
 
 
-const PrivateRoute = ({ children }) => {
-  const token = localStorage.getItem('auth')
+// const PrivateRoute = ({ children }) => {
+//   const token = localStorage.getItem('auth')
 
-  if (token) {
-    return <Navigate to={'/'} />
-  }
+//   if (token) {
+//     return <Navigate to={'/'} />
+//   }
 
-  return children
-}
+//   return children
+// }
 
 const routerConfig = [{
   label: 'Home',

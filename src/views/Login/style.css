@@ -47,12 +47,12 @@ input.form-block__input:focus + label.form-block__input--title {
     color: #adadad;
     font-size: 14px;
 }
-input.form-block__input.show + label.form-block__input--title {
+/* input.form-block__input.show + label.form-block__input--title {
     top: -20px;
     left: -10px;
     color: #adadad;
     font-size: 14px;
-}
+} */
 
 input.form-block__input:focus + label.form-block__input--border:after {
     top: -15px;

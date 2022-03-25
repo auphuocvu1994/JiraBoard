@@ -1,12 +1,13 @@
 import React, { useState } from "react";
 import './style.css';
 import axios from "axios"; //Sử dụng axios
-import { Navigate  } from "react-router-dom";
+import { useNavigate  } from "react-router-dom";
 
 export default function Login(props) {
 
     const [userName, setUserName] = useState([]);
     const [passWord, setPass] = useState();
+    let navigate = useNavigate();
 
     const handeLogin = (e) => {
         e.preventDefault();
@@ -23,8 +24,7 @@ export default function Login(props) {
 
             localStorage.setItem('auth', token);
 
-            return <Navigate  to='/Home' />
-
+            navigate('/Home')
         }
         )
             .catch((err) => console.log(err));
