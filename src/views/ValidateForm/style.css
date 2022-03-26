@@ -104,12 +104,6 @@ button.btn-login {
     height: 50px;
     margin: 20px 0;
     cursor: pointer;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-button.btn-login span{
-    margin-right: 20px;
 }
 
 .more-action span{

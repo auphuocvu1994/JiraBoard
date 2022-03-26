@@ -5,12 +5,11 @@ import * as Yup from "yup";
 import './style.css';
 import axios from "axios"; //Sử dụng axios
 import { useNavigate } from "react-router";
-import { Spinner } from 'react-bootstrap';
 
 const apiUrl = "https://todo-nodemy.herokuapp.com/user";
 
 
-function Login() {
+function ValidatedLoginForm() {
 
   const navigate = useNavigate();
 
@@ -43,11 +42,10 @@ function Login() {
         Yup.object().shape({
           username: Yup.string()
             // .email()
-            .min(4, "Username quá ngắn ít nhất phải 4 ký tự.")
             .required("Không được để trống"),
           password: Yup.string()
             .required("Chưa nhập mật khẩu.")
-            .min(8, "Mật khẩu quá ngắn - ít nhất phải 8 ký tự.")
+            // .min(8, "Mật khẩu quá ngắn - ít nhất phải 8 ký tự.")
             .matches(/(?=.*[0-9])/, "Mật khẩu phải chứa nhất một số.")
         })
       }
@@ -108,11 +106,7 @@ function Login() {
                   )}
 
                 </div>
-                <button className="btn-login" type="submit" disabled={isSubmitting}>
-                    <span>Login</span>
-                  {isSubmitting && <Spinner animation="border" role="status">
-                  </Spinner>}
-                </button>
+                <button className="btn-login" type="submit" disabled={isSubmitting}>Login</button>
 
                 <div className="more-action">
                   <span>Not a member?</span>
@@ -128,4 +122,4 @@ function Login() {
 
 }
 
-export default Login;
+export default ValidatedLoginForm;
