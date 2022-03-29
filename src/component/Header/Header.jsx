@@ -1,10 +1,18 @@
 import React from "react";
 import './style.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBars, faMagnifyingGlass, faCircleInfo, faBell } from '@fortawesome/free-solid-svg-icons';
+import { faBars, faMagnifyingGlass, faCircleInfo, faBell, faRightFromBracket } from '@fortawesome/free-solid-svg-icons';
 import { Form } from "react-bootstrap";
+import { useNavigate } from "react-router";
 
 export default function Header(props) {
+    const navigate = useNavigate();
+
+    const handleLogout = () => {
+        localStorage.clear();
+        navigate('/')
+    }
+
     return (
         <header className="header">
             <div className="header__left">
@@ -35,6 +43,11 @@ export default function Header(props) {
                 <div className="user-infor ml-15">
                     <span>VP</span>
                 </div>
+
+                <span className="btn-ic ml-15">
+                    <FontAwesomeIcon onClick={handleLogout} icon={faRightFromBracket} />
+                </span>
+
             </div>
         </header>
     );

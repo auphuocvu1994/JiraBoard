@@ -1,6 +1,6 @@
 import React from "react";
 import { Formik, Field, Form, ErrorMessage } from 'formik';
-import * as EmailValidator from "email-validator";
+// import * as EmailValidator from "email-validator";
 import * as Yup from "yup";
 import './style.css';
 import axios from "axios"; //Sử dụng axios

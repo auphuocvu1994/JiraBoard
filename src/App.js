@@ -11,8 +11,8 @@ import Home from './views/Home/Home';
 const PrivateRoute = ({ children }) => {
   const token = localStorage.getItem('auth')
 
-  if (token) {
-    return <Navigate to={'/Home'} />
+  if (!token) {
+    return <Navigate to={'/'} />
   }
 
   return children
@@ -22,18 +22,16 @@ const routerConfig = [
   {
     label: 'Login',
     component:
-      <PrivateRoute>
-        <Home />
-      </PrivateRoute>,
+      <Login />,
     path: "/"
   },
   {
     label: 'Home',
-    component: <Home />,
-    // component:
-    // <PrivateRoute>
-    //   <Login />
-    // </PrivateRoute>,
+    component:
+      // component:
+      < PrivateRoute >
+        <Home />
+      </PrivateRoute >,
     path: "/Home"
   },
 

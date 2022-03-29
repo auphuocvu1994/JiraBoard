@@ -1,14 +1,47 @@
-import React from "react";
+import React,{ useState, useEffect } from "react";
 import './style.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEllipsis, faPlus , faPen } from '@fortawesome/free-solid-svg-icons';
+import { faEllipsis, faPlus, faPen, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { Dropdown } from 'react-bootstrap';
+import * as Yup from "yup";
+import axios from "axios"; //Sử dụng axios
+
+
+const apiUrl = "https://todo-nodemy.herokuapp.com/tasks";
 
 export default function TaskBlock(props) {
+
+    const [isClickAddd, setIsClickAddd] = React.useState(false)
+    const [listTask, setListTask] = useState([]);
+
+    const handeAdd = () => {
+        setIsClickAddd(true)
+    }
+    const handeCancel = () => {
+        setIsClickAddd(false)
+    }
+
+    useEffect(() => {
+        axios.post(`${apiUrl}/login`, input)
+          .then(response => {
+            const token = response.data.token;
+
+            console.log(token);
+
+            localStorage.setItem('auth', token);
+
+            navigate('/Home')
+          }
+          )
+          .catch((err) => console.log(err));
+
+    }, [listTask])
+
+
     return (
         <main className="task-block">
             <div className="task-block-top mb-20">
-                <span className="task-block-title">To Do</span>
+                <textarea class="task-block-title">To Do</textarea>
                 <Dropdown className="dd-button">
                     <Dropdown.Toggle id="dropdown-basic" className="dropdown-toggle-custom" >
                         <FontAwesomeIcon icon={faEllipsis} />
@@ -32,10 +65,30 @@ export default function TaskBlock(props) {
                 </ul>
             </div>
             <div className="task-block-action">
-                <button className="task-block-action-add">
-                    <FontAwesomeIcon icon={faPlus} />
-                    <span>Add a card</span>
-                </button>
+
+                {isClickAddd ?
+                    <div className="task-block-content">
+                        <textarea className="task-block-title" placeholder="Write content in here..."></textarea>
+                        <div className="group-btn">
+                            <button className="task-block-action-add" onClick={handeAdd}>
+                                <FontAwesomeIcon icon={faPlus} />
+                                <span>Save</span>
+                            </button>
+                            <button className="task-block-action-add" onClick={handeCancel}>
+                                <FontAwesomeIcon icon={faXmark} />
+                                <span>Cancel</span>
+                            </button>
+                        </div>
+
+                    </div>
+                    : null}
+
+                {!isClickAddd ?
+                    <button className="task-block-action-add" onClick={handeAdd}>
+
+                        <FontAwesomeIcon icon={faPlus} />
+                        <span>Add a card</span>
+                    </button> : null}
             </div>
         </main>
     );
