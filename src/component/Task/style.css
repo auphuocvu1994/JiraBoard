@@ -28,6 +28,15 @@
     display: flex;
     background: #fafafa;
     padding: 5px;
+    cursor: pointer;
+}
+
+.task-block-main li span {
+    display: inline-block;
+    width: 180px;
+    white-space: nowrap;
+    overflow: hidden !important;
+    text-overflow: ellipsis;
 }
 
 .mb-20{
@@ -92,5 +101,9 @@ a.task-block-action-edit {
 }
 
 .task-block-content{
+    width: 100%;
+}
+
+.modal-title{
     width: 100%;
 }

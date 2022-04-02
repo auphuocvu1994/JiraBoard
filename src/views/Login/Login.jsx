@@ -1,5 +1,5 @@
 import React from "react";
-import { Formik, Field, Form, ErrorMessage } from 'formik';
+import { Formik, Field } from 'formik';
 // import * as EmailValidator from "email-validator";
 import * as Yup from "yup";
 import './style.css';
@@ -63,8 +63,7 @@ function Login() {
             isSubmitting,
             handleChange,
             handleBlur,
-            handleSubmit,
-            onValueChange
+            handleSubmit
           } = props;
 
 

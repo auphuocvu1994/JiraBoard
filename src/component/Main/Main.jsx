@@ -6,7 +6,6 @@ export default function Main(props) {
     return (
         <main className="wrap-content">
             <TaskBlock></TaskBlock>
-            <TaskBlock></TaskBlock>
         </main>
     );
 }
