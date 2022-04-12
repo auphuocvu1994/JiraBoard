@@ -4,9 +4,10 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEllipsis, faPlus, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { Dropdown, Button, Modal } from 'react-bootstrap';
 import axios from "axios"; //Sử dụng axios
+import { createTask, removeTask, editTask, getTask } from "../../service/ToDo";
 
 const apiUrl = "https://todo-nodemy.herokuapp.com";
-const token = localStorage.getItem('auth')
+// const token = localStorage.getItem('auth')
 
 
 
@@ -60,6 +61,7 @@ export default function TaskBlock(props) {
 
     const [isClickAddd, setIsClickAddd] = useState(false)
     const [listTask, setListTask] = useState([]);
+    const [token] = useState(() => localStorage.getItem('auth'));
 
     //Add
     const [keyAdd, setKeyAdd] = useState("");
@@ -75,56 +77,37 @@ export default function TaskBlock(props) {
     }
 
 
-    const HandleSave = (e) => {
+    const HandleSave = async (e) => {
         e.preventDefault()
 
-        axios({
-            method: 'post',
-            url: `${apiUrl}/tasks`,
-            headers: { "Authorization": `Bearer ${token}` },
-            data: {
-                title: keyAdd,
-                status: "todo"
-            }
+        const newTask = await createTask({
+            title: keyAdd,
+            status: "todo"
         })
-            .then(res => {
-                setListTask([...listTask, res.data]);
-            }
-            )
-            .catch((error) => {
-                console.log(error)
-            });
+        setListTask([...listTask, newTask]);
     }
 
     //Delete
-    const handleDelete = (idItem, event) => {
+    const handleDelete = async (idItem, event) => {
         event.stopPropagation()
         var arrayCopy = [...listTask];
 
-        axios({
-            method: 'delete',
-            url: `${apiUrl}/tasks`,
-            headers: { "Authorization": `Bearer ${token}` },
-            data: {
-                id: idItem
-            }
-        })
-            .then(res => {
-                var index = arrayCopy.indexOf(idItem)
+        var index = arrayCopy.indexOf(idItem)
 
-                if (index !== -1) {
-                    arrayCopy.splice(index, 1);
-                    setListTask(arrayCopy);
-                }
-            }
-            )
-            .catch((error) => {
-                console.log(error)
-            });
+        if (index !== -1) {
+            arrayCopy.splice(index, 1);
+        }
+
+        await removeTask({
+            id: idItem._id
+        })
+
+        setListTask(arrayCopy);
+
     }
-    
+
     //Edit
-    const handleEdit = (idItem, content) => {
+    const handleEdit = async (idItem, content) => {
         const newArr = listTask.map(obj => {
             if (obj._id === idItem) {
                 return { ...obj, title: content };
@@ -133,34 +116,28 @@ export default function TaskBlock(props) {
             return obj;
         });
 
-        console.log(newArr);
-
         if (!!content) {
-            console.log(idItem, content)
-            // var arrayCopy = [...listTask];
-
-            axios({
-                method: 'post',
-                url: `${apiUrl}/tasks`,
-                headers: { "Authorization": `Bearer ${token}` },
-                data: {
-                    id: idItem,
-                    title: content,
-                    status: "todo"
-                }
+            await editTask({
+                id: idItem,
+                title: content,
+                status: "todo"
             })
-                .then(res => {
-                    setListTask(newArr);
-                }
-                )
-                .catch((error) => {
-                    console.log(error)
-                });
+            setListTask(newArr);
+            
         }
     }
 
     //Get data from API
     useEffect(() => {
+        // await getTask({
+        //     id: idItem,
+        //     title: content,
+        //     status: "todo"
+        // })
+        // setListTask(newArr);
+
+
+
         axios.get(`${apiUrl}/tasks`, { headers: { "Authorization": `Bearer ${token}` } })
             .then(res => {
                 setListTask(res.data);
@@ -209,7 +186,7 @@ export default function TaskBlock(props) {
 
             <div className="task-block-action">
 
-                {isClickAddd ?
+                {isClickAddd &&
                     <div className="task-block-content">
                         <textarea className="task-block-title" onChange={e => handleChange(e.target.value)} placeholder="Write content in here..."></textarea>
                         <div className="group-btn">
@@ -224,14 +201,14 @@ export default function TaskBlock(props) {
                         </div>
 
                     </div>
-                    : null}
+                }
 
-                {!isClickAddd ?
+                {!isClickAddd &&
                     <button className="task-block-action-add" onClick={handeAdd}>
 
                         <FontAwesomeIcon icon={faPlus} />
                         <span>Add a card</span>
-                    </button> : null}
+                    </button>}
             </div>
         </div >
     );
