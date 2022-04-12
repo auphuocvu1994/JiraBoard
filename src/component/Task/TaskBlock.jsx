@@ -5,12 +5,13 @@ import { faEllipsis, faPlus, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { Dropdown, Button, Modal } from 'react-bootstrap';
 import axios from "axios"; //Sử dụng axios
 import { createTask, removeTask, editTask, getTask } from "../../service/ToDo";
+import { v4 as uuidv4 } from 'uuid';
 
 const apiUrl = "https://todo-nodemy.herokuapp.com";
 // const token = localStorage.getItem('auth')
 
 
-
+//list item 
 function ListItem(props) {
     const handleShow = () => setShow(true);
     const { id, obj, name, onEdit, onDelete } = props;
@@ -57,10 +58,15 @@ function ListItem(props) {
 }
 
 
+
+
+
+
 export default function TaskBlock(props) {
 
     const [isClickAddd, setIsClickAddd] = useState(false)
-    const [listTask, setListTask] = useState([]);
+    const [listTodo, setListTodo] = useState([]);
+    const [listDone, setListDone] = useState([]);
     const [token] = useState(() => localStorage.getItem('auth'));
 
     //Add
@@ -77,6 +83,54 @@ export default function TaskBlock(props) {
     }
 
 
+    
+
+
+    const columnsFromBackend = {
+        [uuidv4()]: {
+            name: "Requested",
+            items: listTodo
+        },
+        [uuidv4()]: {
+            name: "To do",
+            items: []
+        },
+        [uuidv4()]: {
+            name: "In Progress",
+            items: []
+        },
+        [uuidv4()]: {
+            name: "Done",
+            items: []
+        }
+    };
+
+    //Get data from API
+    useEffect(() => {
+        axios.get(`${apiUrl}/tasks?status=todo`, { headers: { "Authorization": `Bearer ${token}` } })
+            .then(res => {
+                setListTodo(res.data);
+            }
+            )
+            .catch((error) => {
+                console.log(error)
+            });
+    }, [])
+    //Get data from API
+    useEffect(() => {
+        axios.get(`${apiUrl}/tasks?status=done`, { headers: { "Authorization": `Bearer ${token}` } })
+            .then(res => {
+                setListDone(res.data);
+            }
+            )
+            .catch((error) => {
+                console.log(error)
+            });
+    }, [])
+
+
+    const [columns, setColumns] = useState(columnsFromBackend);
+
     const HandleSave = async (e) => {
         e.preventDefault()
 
@@ -84,13 +138,13 @@ export default function TaskBlock(props) {
             title: keyAdd,
             status: "todo"
         })
-        setListTask([...listTask, newTask]);
+        setListTodo([...listTodo, newTask]);
     }
 
     //Delete
     const handleDelete = async (idItem, event) => {
         event.stopPropagation()
-        var arrayCopy = [...listTask];
+        var arrayCopy = [...listTodo];
 
         var index = arrayCopy.indexOf(idItem)
 
@@ -102,13 +156,13 @@ export default function TaskBlock(props) {
             id: idItem._id
         })
 
-        setListTask(arrayCopy);
+        setListTodo(arrayCopy);
 
     }
 
     //Edit
     const handleEdit = async (idItem, content) => {
-        const newArr = listTask.map(obj => {
+        const newArr = listTodo.map(obj => {
             if (obj._id === idItem) {
                 return { ...obj, title: content };
             }
@@ -122,31 +176,31 @@ export default function TaskBlock(props) {
                 title: content,
                 status: "todo"
             })
-            setListTask(newArr);
-            
+            setListTodo(newArr);
+
         }
     }
 
-    //Get data from API
-    useEffect(() => {
-        // await getTask({
-        //     id: idItem,
-        //     title: content,
-        //     status: "todo"
-        // })
-        // setListTask(newArr);
+    // //Get data from API
+    // useEffect(() => {
+    //     // await getTask({
+    //     //     id: idItem,
+    //     //     title: content,
+    //     //     status: "todo"
+    //     // })
+    //     // setListTodo(newArr);
 
 
 
-        axios.get(`${apiUrl}/tasks`, { headers: { "Authorization": `Bearer ${token}` } })
-            .then(res => {
-                setListTask(res.data);
-            }
-            )
-            .catch((error) => {
-                console.log(error)
-            });
-    }, [])
+    //     axios.get(`${apiUrl}/tasks`, { headers: { "Authorization": `Bearer ${token}` } })
+    //         .then(res => {
+    //             setListTodo(res.data);
+    //         }
+    //         )
+    //         .catch((error) => {
+    //             console.log(error)
+    //         });
+    // }, [])
 
 
     return (
@@ -168,12 +222,12 @@ export default function TaskBlock(props) {
             <div className="task-block-main mb-20">
                 <ul>
                     {
-                        listTask.map((item, index) => {
+                        listTodo.map((item, index) => {
                             return (
                                 <ListItem
                                     key={item._id}
                                     id={item._id}
-                                    data={listTask}
+                                    data={listTodo}
                                     obj={item}
                                     name={item.title}
                                     onEdit={handleEdit}
