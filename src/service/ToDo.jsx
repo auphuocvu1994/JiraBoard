@@ -1,4 +1,4 @@
-import { get, post, deleteItem } from "../ultils/api"
+import { get, post, patch, deleteItem } from "../ultils/api"
 
 /**
  * 
@@ -21,7 +21,7 @@ export const createTask = async (data) => {
 
 export const editTask = async (data) => {
     try {
-        const newTask = await post('/tasks', data)
+        const newTask = await patch('/tasks', data)
 
         return newTask
     } catch (error) {
@@ -36,7 +36,7 @@ export const editTask = async (data) => {
 
 export const removeTask = async (data) => {
     try {
-        
+
 
         const newTask = await deleteItem('/tasks', data)
 
@@ -45,9 +45,9 @@ export const removeTask = async (data) => {
         console.error('error', error.message)
     }
 }
-export async function getTask() {
+export const getTask = async () => {
     try {
-        const result = await get('/tasks')
+        const result = await get('/tasks','status=todo')
 
         return result
     } catch (error) {
