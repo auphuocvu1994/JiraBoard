@@ -130,45 +130,49 @@ export default function TaskBlock(props) {
     }
 
     //Get data from API
-    // useEffect(() => {
+    useEffect(async () => {
+        const lstToDo = await getTask({
+            status: "todo"
+        })
 
-    // }, [])
+        objData[Object.keys(objData)[0]].items = lstToDo;
+
+        setListTodo(() => {
+            return listTodo
+        })
+
+        // setColumns(objData)
+    }, [])
 
     // Get data from API
-    // useEffect(() => {
-    //     axios.get(`${apiUrl}/tasks?status=todo`, { headers: { "Authorization": `Bearer ${token}` } })
-    //         .then(res => {
-    //             objData[Object.keys(objData)[0]].items = res.data;
-    //         }
-    //         )
-    //         .catch((error) => {
-    //             console.log(error)
-    //         });
+    useEffect(async () => {
+        const lstToDo = await getTask({
+            status: "done"
+        })
 
-    //     axios.get(`${apiUrl}/tasks?status=done`, { headers: { "Authorization": `Bearer ${token}` } })
-    //         .then(res => {
-    //             objData[Object.keys(objData)[2]].items = res.data;
-    //         }
-    //         )
-    //         .catch((error) => {
-    //             console.log(error)
-    //         });
-    //     axios.get(`${apiUrl}/tasks?status=in_progress`, { headers: { "Authorization": `Bearer ${token}` } })
-    //         .then(res => {
-    //             objData[Object.keys(objData)[1]].items = res.data;
-    //         }
-    //         )
-    //         .catch((error) => {
-    //             console.log(error)
-    //         });
+        objData[Object.keys(objData)[2]].items = lstToDo;
 
-    //     return setColumns(objData)
-    // }, [])
+        setListTodo(() => {
+            return listDone
+        })
+
+        // setColumns(objData)
+    }, [])
 
     // //Get data from API
-    // useEffect(() => {
+    useEffect(async () => {
+        const lstToDo = await getTask({
+            status: "in_progress"
+        })
 
-    // }, [])
+        objData[Object.keys(objData)[1]].items = lstToDo;
+
+        setListTodo(() => {
+            return listInpro
+        })
+
+        // setColumns(objData)
+    }, [])
 
 
     const onDragEnd = (result, columns, setColumns) => {
@@ -358,7 +362,7 @@ export default function TaskBlock(props) {
                                     </Dropdown.Menu>
                                 </Dropdown>
                             </div>
-                            {/* <div
+                            <div
                                 className="task-block-main"
                                 style={{
                                     display: "flex",
@@ -429,7 +433,7 @@ export default function TaskBlock(props) {
                                         }}
                                     </Droppable>
                                 </ul>
-                            </div > */}
+                            </div >
                             <div className="task-block-action">
 
                                 {column.isShow &&

@@ -45,9 +45,14 @@ export const removeTask = async (data) => {
         console.error('error', error.message)
     }
 }
-export const getTask = async () => {
+
+/**
+ * 
+ * @param {*} data {status}
+ */
+export const getTask = async (data) => {
     try {
-        const result = await get('/tasks','status=todo')
+        const result = await get('/tasks',data)
 
         return result
     } catch (error) {
