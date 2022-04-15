@@ -3,14 +3,8 @@ import './style.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEllipsis, faPlus, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { Dropdown, Button, Modal } from 'react-bootstrap';
-import axios from "axios"; //Sử dụng axios
 import { createTask, removeTask, editTask, getTask } from "../../service/ToDo";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
-import { v4 as uuidv4 } from 'uuid';
-
-
-const apiUrl = "https://todo-nodemy.herokuapp.com";
-// const token = localStorage.getItem('auth')
 
 
 //list item 
@@ -59,7 +53,6 @@ function ListItem(props) {
     );
 }
 
-
 const baseData = {
     todo: {
         name: "To do",
@@ -82,8 +75,6 @@ const baseData = {
 };
 
 export default function TaskBlock(props) {
-    const [token] = useState(() => localStorage.getItem('auth'));
-    const [isClickAddd, setIsClickAddd] = useState(false)
     const [listTodo, setListTodo] = useState([]);
     const [listDone, setListDone] = useState([]);
     const [listInpro, setListInpro] = useState([]);
@@ -152,7 +143,7 @@ export default function TaskBlock(props) {
 
         objData[Object.keys(objData)[2]].items = lstToDo;
 
-        setListTodo(() => {
+        setListDone(() => {
             return listDone
         })
 
@@ -167,7 +158,7 @@ export default function TaskBlock(props) {
 
         objData[Object.keys(objData)[1]].items = lstToDo;
 
-        setListTodo(() => {
+        setListInpro(() => {
             return listInpro
         })
 
