@@ -61,19 +61,19 @@ function ListItem(props) {
 
 
 const baseData = {
-    [uuidv4()]: {
+    todo: {
         name: "To do",
         items: [],
-        isShow: true,
+        isShow: false,
         title: "todo"
     },
-    [uuidv4()]: {
+    inprogress: {
         name: "In Progress",
         items: [],
         isShow: false,
         title: "inprogress"
     },
-    [uuidv4()]: {
+    done: {
         name: "Done",
         items: [],
         isShow: false,
@@ -88,20 +88,41 @@ export default function TaskBlock(props) {
     const [listDone, setListDone] = useState([]);
     const [listInpro, setListInpro] = useState([]);
     const [objData, setObjData] = useState(baseData);
-
+    const [columns, setColumns] = useState(objData);
 
     //Add
     const [keyAdd, setKeyAdd] = useState("");
     const handeAdd = (column) => {
-        console.log(column)
+        const newObj = { ...objData }
+        Object.values(newObj).forEach((val) => {
+            if (column.title === val.title) {
+                newObj[val.title].isShow = true
+            } else {
+                newObj[val.title].isShow = false
+            }
+
+        })
+
         setObjData((column) => {
-            return {
-                isShow: true
-            };
+            return newObj
         })
     }
-    const handeCancel = () => {
-        setIsClickAddd(false)
+
+    console.log("re")
+    const handeCancel = (column) => {
+        const newObj = { ...objData }
+        Object.values(newObj).forEach((val) => {
+            if (column.title === val.title && column.isShow === false) {
+                newObj[val.title].isShow = true
+            } else {
+                newObj[val.title].isShow = false
+            }
+
+        })
+
+        setObjData((column) => {
+            return newObj
+        })
     }
 
     const handleChange = (e) => {
@@ -109,50 +130,45 @@ export default function TaskBlock(props) {
     }
 
     //Get data from API
-    useEffect(() => {
+    // useEffect(() => {
 
-        axios.get(`${apiUrl}/tasks?status=todo`, { headers: { "Authorization": `Bearer ${token}` } })
-            .then(res => {
+    // }, [])
 
+    // Get data from API
+    // useEffect(() => {
+    //     axios.get(`${apiUrl}/tasks?status=todo`, { headers: { "Authorization": `Bearer ${token}` } })
+    //         .then(res => {
+    //             objData[Object.keys(objData)[0]].items = res.data;
+    //         }
+    //         )
+    //         .catch((error) => {
+    //             console.log(error)
+    //         });
 
-                baseData[Object.keys(baseData)[0]].items = res.data;
+    //     axios.get(`${apiUrl}/tasks?status=done`, { headers: { "Authorization": `Bearer ${token}` } })
+    //         .then(res => {
+    //             objData[Object.keys(objData)[2]].items = res.data;
+    //         }
+    //         )
+    //         .catch((error) => {
+    //             console.log(error)
+    //         });
+    //     axios.get(`${apiUrl}/tasks?status=in_progress`, { headers: { "Authorization": `Bearer ${token}` } })
+    //         .then(res => {
+    //             objData[Object.keys(objData)[1]].items = res.data;
+    //         }
+    //         )
+    //         .catch((error) => {
+    //             console.log(error)
+    //         });
 
-                setListTodo(res.data);
+    //     return setColumns(objData)
+    // }, [])
 
-            }
-            )
-            .catch((error) => {
-                console.log(error)
-            });
-        setListTodo(lstTodo);
-    }, [])
-    //Get data from API
-    useEffect(() => {
-        axios.get(`${apiUrl}/tasks?status=done`, { headers: { "Authorization": `Bearer ${token}` } })
-            .then(res => {
-                baseData[Object.keys(baseData)[2]].items = res.data;
-                setListDone(res.data);
-            }
-            )
-            .catch((error) => {
-                console.log(error)
-            });
-    }, [])
     // //Get data from API
-    useEffect(() => {
-        axios.get(`${apiUrl}/tasks?status=in_progress`, { headers: { "Authorization": `Bearer ${token}` } })
-            .then(res => {
-                baseData[Object.keys(baseData)[1]].items = res.data;
-                setListInpro(res.data);
-            }
-            )
-            .catch((error) => {
-                console.log(error)
-            });
-    }, [])
+    // useEffect(() => {
 
-
-
+    // }, [])
 
 
     const onDragEnd = (result, columns, setColumns) => {
@@ -194,12 +210,12 @@ export default function TaskBlock(props) {
 
     const HandleSave = async (e) => {
         e.preventDefault()
-
-        const newTask = await createTask({
-            title: keyAdd,
-            status: "todo"
-        })
-        setListTodo([...listTodo, newTask]);
+        console.log("save")
+        // const newTask = await createTask({
+        //     title: keyAdd,
+        //     status: "todo"
+        // })
+        // setListTodo([...listTodo, newTask]);
     }
 
     //Delete
@@ -248,203 +264,202 @@ export default function TaskBlock(props) {
 
     // console.log(baseData)
 
-    const [columns, setColumns] = useState(objData);
-
-    // console.log(columns)
-
-    return (
-        <div className="task-block">
-            <div className="task-block-top mb-20">
-                <textarea className="task-block-title" defaultValue="To Do"></textarea>
-                <Dropdown className="dd-button">
-                    <Dropdown.Toggle id="dropdown-basic" className="dropdown-toggle-custom" >
-                        <FontAwesomeIcon icon={faEllipsis} />
-                    </Dropdown.Toggle>
-
-                    <Dropdown.Menu>
-                        <Dropdown.Item href="#/action-1">Action</Dropdown.Item>
-                        <Dropdown.Item href="#/action-2">Another action</Dropdown.Item>
-                        <Dropdown.Item href="#/action-3">Something else</Dropdown.Item>
-                    </Dropdown.Menu>
-                </Dropdown>
-            </div>
-            <div className="task-block-main mb-20">
-                <ul>
-                    {
-                        listTodo.map((item, index) => {
-                            return (
-                                <ListItem
-                                    key={item._id}
-                                    id={item._id}
-                                    data={listTodo}
-                                    obj={item}
-                                    name={item.title}
-                                    onEdit={handleEdit}
-                                    onDelete={handleDelete} />
-                            )
-                        })
-                    }
-                </ul>
-            </div>
-
-            <div className="task-block-action">
-
-                {isClickAddd &&
-                    <div className="task-block-content">
-                        <textarea className="task-block-title" onChange={e => handleChange(e.target.value)} placeholder="Write content in here..."></textarea>
-                        <div className="group-btn">
-                            <button className="task-block-action-add" onClick={HandleSave}>
-                                <FontAwesomeIcon icon={faPlus} />
-                                <span>Save</span>
-                            </button>
-                            <button className="task-block-action-add" onClick={handeCancel}>
-                                <FontAwesomeIcon icon={faXmark} />
-                                <span>Cancel</span>
-                            </button>
-                        </div>
-
-                    </div>
-                }
-
-                {!isClickAddd &&
-                    <button className="task-block-action-add" onClick={handeAdd}>
-
-                        <FontAwesomeIcon icon={faPlus} />
-                        <span>Add a card</span>
-                    </button>}
-            </div>
-        </div >
-    );
 
 
+    console.log(objData)
 
     // return (
+    //     <div className="task-block">
+    //         <div className="task-block-top mb-20">
+    //             <textarea className="task-block-title" defaultValue="To Do"></textarea>
+    //             <Dropdown className="dd-button">
+    //                 <Dropdown.Toggle id="dropdown-basic" className="dropdown-toggle-custom" >
+    //                     <FontAwesomeIcon icon={faEllipsis} />
+    //                 </Dropdown.Toggle>
 
-    //     <div style={{ display: "flex", justifyContent: "center", height: "100%" }}>
+    //                 <Dropdown.Menu>
+    //                     <Dropdown.Item href="#/action-1">Action</Dropdown.Item>
+    //                     <Dropdown.Item href="#/action-2">Another action</Dropdown.Item>
+    //                     <Dropdown.Item href="#/action-3">Something else</Dropdown.Item>
+    //                 </Dropdown.Menu>
+    //             </Dropdown>
+    //         </div>
+    //         <div className="task-block-main mb-20">
+    //             <ul>
+    //                 {
+    //                     listTodo.map((item, index) => {
+    //                         return (
+    //                             <ListItem
+    //                                 key={item._id}
+    //                                 id={item._id}
+    //                                 data={listTodo}
+    //                                 obj={item}
+    //                                 name={item.title}
+    //                                 onEdit={handleEdit}
+    //                                 onDelete={handleDelete} />
+    //                         )
+    //                     })
+    //                 }
+    //             </ul>
+    //         </div>
 
-    //         <DragDropContext
-    //             onDragEnd={result => onDragEnd(result, columns, setColumns)}
-    //         >
-    //             {Object.entries(columns).map(([columnId, column], index) => {
-    //                 return (
-    //                     <div className="task-block" key={index}>
-    //                         <div className="task-block-top">
-    //                             <textarea className="task-block-title" defaultValue={column.name}></textarea>
-    //                             <Dropdown className="dd-button">
-    //                                 <Dropdown.Toggle id="dropdown-basic" className="dropdown-toggle-custom" >
-    //                                     <FontAwesomeIcon icon={faEllipsis} />
-    //                                 </Dropdown.Toggle>
+    //         <div className="task-block-action">
 
-    //                                 <Dropdown.Menu>
-    //                                     <Dropdown.Item href="#/action-1">Action</Dropdown.Item>
-    //                                     <Dropdown.Item href="#/action-2">Another action</Dropdown.Item>
-    //                                     <Dropdown.Item href="#/action-3">Something else</Dropdown.Item>
-    //                                 </Dropdown.Menu>
-    //                             </Dropdown>
-    //                         </div>
-    //                         <div
-    //                             className="task-block-main"
-    //                             style={{
-    //                                 display: "flex",
-    //                                 flexDirection: "column",
-    //                                 alignItems: "center"
-    //                             }}
-    //                             key={columnId}
-    //                         >
-    //                             <ul style={{ margin: 8 }}>
-    //                                 <Droppable droppableId={columnId} key={columnId}>
-    //                                     {(provided, snapshot) => {
-    //                                         return (
-    //                                             <div
-    //                                                 {...provided.droppableProps}
-    //                                                 ref={provided.innerRef}
-    //                                                 style={{
-    //                                                     background: snapshot.isDraggingOver
-    //                                                         ? "lightblue"
-    //                                                         : "lightgrey",
-    //                                                     padding: 4,
-    //                                                     width: 250,
-    //                                                     minHeight: 500,
-    //                                                     width: '100%',
-    //                                                 }}
-
-    //                                                 className="task-block-main"
-    //                                             >
-    //                                                 {column.items.map((item, index) => {
-    //                                                     return (
-    //                                                         <Draggable
-    //                                                             key={index}
-    //                                                             draggableId={item._id}
-    //                                                             index={index}
-    //                                                         >
-    //                                                             {(provided, snapshot) => {
-    //                                                                 return (
-    //                                                                     < div
-    //                                                                         ref={provided.innerRef}
-    //                                                                         {...provided.draggableProps}
-    //                                                                         {...provided.dragHandleProps}
-    //                                                                         style={{
-    //                                                                             userSelect: "none",
-    //                                                                             backgroundColor: snapshot.isDragging
-    //                                                                                 ? "#263B4A"
-    //                                                                                 : "#456C86",
-    //                                                                             ...provided.draggableProps.style
-    //                                                                         }}
-
-    //                                                                     >
-    //                                                                         <ListItem
-    //                                                                             key={item._id}
-    //                                                                             id={item._id}
-    //                                                                             obj={item}
-    //                                                                             name={item.title}
-    //                                                                             onEdit={handleEdit}
-    //                                                                             onDelete={handleDelete}
-    //                                                                         />
-
-
-    //                                                                     </div>
-    //                                                                 );
-    //                                                             }}
-    //                                                         </Draggable>
-    //                                                     );
-    //                                                 })}
-    //                                                 {provided.placeholder}
-    //                                             </div>
-    //                                         );
-    //                                     }}
-    //                                 </Droppable>
-    //                             </ul>
-    //                         </div >
-    //                         <div className="task-block-action">
-
-    //                             {column.isShow &&
-    //                                 <div className="task-block-content">
-    //                                     <textarea className="task-block-title" onChange={e => handleChange(e.target.value)} placeholder="Write content in here..."></textarea>
-    //                                     <div className="group-btn">
-    //                                         <button className="task-block-action-add" onClick={HandleSave}>
-    //                                             <FontAwesomeIcon icon={faPlus} />
-    //                                             <span>Save</span>
-    //                                         </button>
-    //                                         <button className="task-block-action-add" onClick={handeCancel}>
-    //                                             <FontAwesomeIcon icon={faXmark} />
-    //                                             <span>Cancel</span>
-    //                                         </button>
-    //                                     </div>
-
-    //                                 </div>
-    //                             }
-
-    //                             {!column.isShow &&
-    //                                 <button className="task-block-action-add" onClick={() => handeAdd(column)}>
-
-    //                                     <FontAwesomeIcon icon={faPlus} />
-    //                                     <span>Add a card</span>
-    //                                 </button>}
-    //                         </div>
+    //             {isClickAddd &&
+    //                 <div className="task-block-content">
+    //                     <textarea className="task-block-title" onChange={e => handleChange(e.target.value)} placeholder="Write content in here..."></textarea>
+    //                     <div className="group-btn">
+    //                         <button className="task-block-action-add" onClick={HandleSave}>
+    //                             <FontAwesomeIcon icon={faPlus} />
+    //                             <span>Save</span>
+    //                         </button>
+    //                         <button className="task-block-action-add" onClick={handeCancel}>
+    //                             <FontAwesomeIcon icon={faXmark} />
+    //                             <span>Cancel</span>
+    //                         </button>
     //                     </div>
-    //                 );
-    //             })}
-    //         </DragDropContext >
+
+    //                 </div>
+    //             }
+
+    //             {!isClickAddd &&
+    //                 <button className="task-block-action-add" onClick={handeAdd}>
+
+    //                     <FontAwesomeIcon icon={faPlus} />
+    //                     <span>Add a card</span>
+    //                 </button>}
+    //         </div>
     //     </div >
     // );
+
+
+
+    return (
+
+        <div style={{ display: "flex", justifyContent: "center", height: "100%" }}>
+
+            <DragDropContext
+                onDragEnd={result => onDragEnd(result, columns, setColumns)}
+            >
+                {Object.entries(columns).map(([columnId, column], index) => {
+                    return (
+                        <div className="task-block" key={index}>
+                            <div className="task-block-top">
+                                <textarea className="task-block-title" defaultValue={column.name}></textarea>
+                                <Dropdown className="dd-button">
+                                    <Dropdown.Toggle id="dropdown-basic" className="dropdown-toggle-custom" >
+                                        <FontAwesomeIcon icon={faEllipsis} />
+                                    </Dropdown.Toggle>
+
+                                    <Dropdown.Menu>
+                                        <Dropdown.Item href="#/action-1">Action</Dropdown.Item>
+                                        <Dropdown.Item href="#/action-2">Another action</Dropdown.Item>
+                                        <Dropdown.Item href="#/action-3">Something else</Dropdown.Item>
+                                    </Dropdown.Menu>
+                                </Dropdown>
+                            </div>
+                            {/* <div
+                                className="task-block-main"
+                                style={{
+                                    display: "flex",
+                                    flexDirection: "column",
+                                    alignItems: "center"
+                                }}
+                                key={columnId}
+                            >
+                                <ul style={{ margin: 8 }}>
+                                    <Droppable droppableId={columnId} key={columnId}>
+                                        {(provided, snapshot) => {
+                                            return (
+                                                <div
+                                                    {...provided.droppableProps}
+                                                    ref={provided.innerRef}
+                                                    style={{
+                                                        background: snapshot.isDraggingOver
+                                                            ? "lightblue"
+                                                            : "lightgrey",
+                                                        padding: 4,
+                                                        minHeight: 500,
+                                                        width: '100%',
+                                                    }}
+
+                                                    className="task-block-main"
+                                                >
+                                                    {column.items.map((item, index) => {
+                                                        return (
+                                                            <Draggable
+                                                                key={index}
+                                                                draggableId={item._id}
+                                                                index={index}
+                                                            >
+                                                                {(provided, snapshot) => {
+                                                                    return (
+                                                                        < div
+                                                                            ref={provided.innerRef}
+                                                                            {...provided.draggableProps}
+                                                                            {...provided.dragHandleProps}
+                                                                            style={{
+                                                                                userSelect: "none",
+                                                                                backgroundColor: snapshot.isDragging
+                                                                                    ? "#263B4A"
+                                                                                    : "#456C86",
+                                                                                ...provided.draggableProps.style
+                                                                            }}
+
+                                                                        >
+                                                                            <ListItem
+                                                                                key={item._id}
+                                                                                id={item._id}
+                                                                                obj={item}
+                                                                                name={item.title}
+                                                                                onEdit={handleEdit}
+                                                                                onDelete={handleDelete}
+                                                                            />
+
+
+                                                                        </div>
+                                                                    );
+                                                                }}
+                                                            </Draggable>
+                                                        );
+                                                    })}
+                                                    {provided.placeholder}
+                                                </div>
+                                            );
+                                        }}
+                                    </Droppable>
+                                </ul>
+                            </div > */}
+                            <div className="task-block-action">
+
+                                {column.isShow &&
+                                    <div className="task-block-content">
+                                        <textarea className="task-block-title" onChange={e => handleChange(e.target.value)} placeholder="Write content in here..."></textarea>
+                                        <div className="group-btn">
+                                            <button className="task-block-action-add" onClick={HandleSave}>
+                                                <FontAwesomeIcon icon={faPlus} />
+                                                <span>Save</span>
+                                            </button>
+                                            <button className="task-block-action-add" onClick={() => handeCancel(column)}>
+                                                <FontAwesomeIcon icon={faXmark} />
+                                                <span>Cancel</span>
+                                            </button>
+                                        </div>
+
+                                    </div>
+                                }
+
+                                {!column.isShow &&
+                                    <button className="task-block-action-add" onClick={() => handeAdd(column)}>
+
+                                        <FontAwesomeIcon icon={faPlus} />
+                                        <span>Add a card</span>
+                                    </button>}
+                            </div>
+                        </div>
+                    );
+                })}
+            </DragDropContext >
+        </div >
+    );
 }
