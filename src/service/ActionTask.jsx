@@ -37,12 +37,12 @@ export const editTask = async (data) => {
 export const removeTask = async (data) => {
     try {
 
-
+        console.log(data);
         const newTask = await deleteItem('/tasks', data)
 
         return newTask
     } catch (error) {
-        console.error('error', error.message)
+        console.error('error', error)
     }
 }
 

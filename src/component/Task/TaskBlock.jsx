@@ -3,23 +3,24 @@ import './style.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEllipsis, faPlus, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { Dropdown, Button, Modal } from 'react-bootstrap';
-import { createTask, removeTask, editTask, getTask } from "../../service/ToDo";
+import { createTask, removeTask, editTask, getTask } from "../../service/ActionTask";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
 
 
 //list item 
 function ListItem(props) {
     const handleShow = () => setShow(true);
-    const { id, obj, name, onEdit, onDelete } = props;
+    const { id, obj, name, onEdit, onDelete, columnDetail } = props;
 
     const [show, setShow] = useState(false);
     const handleClose = () => setShow(false);
 
     const [txtContent, setTxtContent] = useState();
 
-    const handleSave = (id, text) => {
+    const handleSaveEdit = (id, content, status) => {
         setShow(false);
-        onEdit(id, text);
+
+        onEdit(id, content, status);
     };
 
     const handleChange = (e) => {
@@ -44,7 +45,7 @@ function ListItem(props) {
                     <Button variant="secondary" onClick={() => handleClose()}>
                         Close
                     </Button>
-                    <Button variant="primary" onClick={(e) => handleSave(id, txtContent)}>
+                    <Button variant="primary" onClick={(e) => handleSaveEdit(obj._id, txtContent, obj.status)}>
                         Save Changes
                     </Button>
                 </Modal.Footer>
@@ -60,11 +61,11 @@ const baseData = {
         isShow: false,
         title: "todo"
     },
-    inprogress: {
+    in_progress: {
         name: "In Progress",
         items: [],
         isShow: false,
-        title: "inprogress"
+        title: "in_progress"
     },
     done: {
         name: "Done",
@@ -75,33 +76,33 @@ const baseData = {
 };
 
 export default function TaskBlock(props) {
-    const [listTodo, setListTodo] = useState([]);
-    const [listDone, setListDone] = useState([]);
-    const [listInpro, setListInpro] = useState([]);
-    const [objData, setObjData] = useState(baseData);
-    const [columns, setColumns] = useState(objData);
+    const [columns, setColumns] = useState(() => {
+
+        const initialValue = JSON.parse(localStorage.getItem("baseData"));
+
+        return  initialValue || baseData;
+    });
 
     //Add
     const [keyAdd, setKeyAdd] = useState("");
     const handeAdd = (column) => {
-        const newObj = { ...objData }
+        const newObj = { ...columns }
         Object.values(newObj).forEach((val) => {
+            console.log(val);
             if (column.title === val.title) {
                 newObj[val.title].isShow = true
             } else {
                 newObj[val.title].isShow = false
             }
-
         })
 
-        setObjData((column) => {
+        setColumns((column) => {
             return newObj
         })
     }
 
-    console.log("re")
     const handeCancel = (column) => {
-        const newObj = { ...objData }
+        const newObj = { ...columns }
         Object.values(newObj).forEach((val) => {
             if (column.title === val.title && column.isShow === false) {
                 newObj[val.title].isShow = true
@@ -111,7 +112,7 @@ export default function TaskBlock(props) {
 
         })
 
-        setObjData((column) => {
+        setColumns((column) => {
             return newObj
         })
     }
@@ -126,49 +127,42 @@ export default function TaskBlock(props) {
             status: "todo"
         })
 
-        objData[Object.keys(objData)[0]].items = lstToDo;
+        columns[Object.keys(columns)[0]].items = lstToDo;
 
-        setListTodo(() => {
-            return listTodo
-        })
-
-        // setColumns(objData)
-    }, [])
-
-    // Get data from API
-    useEffect(async () => {
-        const lstToDo = await getTask({
-            status: "done"
-        })
-
-        objData[Object.keys(objData)[2]].items = lstToDo;
-
-        setListDone(() => {
-            return listDone
-        })
-
-        // setColumns(objData)
-    }, [])
-
-    // //Get data from API
-    useEffect(async () => {
-        const lstToDo = await getTask({
+        const lstIpro = await getTask({
             status: "in_progress"
         })
 
-        objData[Object.keys(objData)[1]].items = lstToDo;
+        columns[Object.keys(columns)[1]].items = lstIpro;
 
-        setListInpro(() => {
-            return listInpro
+
+        const lstDone = await getTask({
+            status: "done"
         })
 
-        // setColumns(objData)
+        columns[Object.keys(columns)[2]].items = lstDone;
+
+
+        const newObj = { ...columns }
+
+        
+        setColumns((column) => {
+            localStorage.setItem("baseData", JSON.stringify(newObj));
+            return newObj
+        })
+
+        
+
     }, [])
 
 
     const onDragEnd = (result, columns, setColumns) => {
+
+        console.log(result)
+
+
         if (!result.destination) return;
-        const { source, destination } = result;
+        const { source, destination, draggableId } = result;
 
         if (source.droppableId !== destination.droppableId) {
             const sourceColumn = columns[source.droppableId];
@@ -177,7 +171,8 @@ export default function TaskBlock(props) {
             const destItems = [...destColumn.items];
             const [removed] = sourceItems.splice(source.index, 1);
             destItems.splice(destination.index, 0, removed);
-            setColumns({
+
+            const newColumn = {
                 ...columns,
                 [source.droppableId]: {
                     ...sourceColumn,
@@ -187,148 +182,157 @@ export default function TaskBlock(props) {
                     ...destColumn,
                     items: destItems
                 }
+            }
+
+            setColumns(() => {
+                localStorage.setItem("baseData", JSON.stringify(newColumn));
+                return newColumn
             });
+
+            console.log({
+                ...columns,
+                [source.droppableId]: {
+                    ...sourceColumn,
+                    items: sourceItems
+                },
+                [destination.droppableId]: {
+                    ...destColumn,
+                    items: destItems
+                }
+            })
+
+            editTask({
+                id: draggableId,
+                status: destination.droppableId
+            })
+
+            console.log("Khong bang")
         } else {
+            console.log("bang")
             const column = columns[source.droppableId];
             const copiedItems = [...column.items];
             const [removed] = copiedItems.splice(source.index, 1);
             copiedItems.splice(destination.index, 0, removed);
-            setColumns({
+
+            const newColumn = {
                 ...columns,
                 [source.droppableId]: {
                     ...column,
                     items: copiedItems
                 }
+            }
+
+            setColumns(() => {
+                localStorage.setItem("baseData", JSON.stringify(newColumn));
+                return newColumn
             });
+
         }
+
+        // localStorage.setItem('baseData', token);
     };
 
-    const HandleSave = async (e) => {
+    const HandleSave = async (e, column) => {
         e.preventDefault()
-        console.log("save")
-        // const newTask = await createTask({
-        //     title: keyAdd,
-        //     status: "todo"
-        // })
+
+        const newTask = await createTask({
+            title: keyAdd,
+            status: column.title
+        })
         // setListTodo([...listTodo, newTask]);
+
+        const newObj = { ...columns }
+        const list = newObj[column.title].items
+
+        newObj[column.title].items = [...list, newTask]
+
+        setColumns((column) => {
+            return newObj
+        })
+
     }
 
     //Delete
-    const handleDelete = async (idItem, event) => {
+    const handleDelete = async (item, event) => {
         event.stopPropagation()
 
-        console.log(idItem)
-        var arrayCopy = [...listTodo];
+        console.log(item)
 
-        var index = arrayCopy.indexOf(idItem)
+        const newObj = { ...columns }
+        const list = newObj[item.status].items
+
+        const index = list.findIndex(object => {
+            return object._id === item._id;
+        });
 
         if (index !== -1) {
-            arrayCopy.splice(index, 1);
+            list.splice(index, 1);
+            newObj[item.status].items = list
+
+            await removeTask({
+                id: item._id
+            })
         }
 
-        await removeTask({
-            id: idItem._id
+        setColumns((column) => {
+            return newObj
         })
 
-        baseData[Object.keys(baseData)[0]].items = arrayCopy;
 
-        setListTodo(arrayCopy);
+        // var arrayCopy = [...listTodo];
+
+        // var index = arrayCopy.indexOf(idItem)
+
+        // if (index !== -1) {
+        //     arrayCopy.splice(index, 1);
+        // }
+
+        // await removeTask({
+        //     id: idItem._id
+        // })
+
+        // setListTodo(arrayCopy);
 
     }
 
     //Edit
-    const handleEdit = async (idItem, content) => {
-        const newArr = listTodo.map(obj => {
-            if (obj._id === idItem) {
-                return { ...obj, title: content };
-            }
+    const handleEdit = async (idItem, contentItem, titleItem) => {
 
-            return obj;
+        console.log(idItem, contentItem, titleItem)
+
+        const newObj = { ...columns }
+
+        newObj[titleItem].items.map(obj => {
+            if (obj._id === idItem) {
+                obj.title = contentItem
+            }
+            return obj
         });
 
-        if (!!content) {
+        // const newArr = listTodo.map(obj => {
+        //     if (obj._id === idItem) {
+        //         return { ...obj, title: content };
+        //     }
+
+        //     return obj;
+        // });
+        // setListTodo(newArr);
+
+        if (!!contentItem) {
             await editTask({
                 id: idItem,
-                title: content,
-                status: "todo"
+                title: contentItem,
+                status: titleItem
             })
-            setListTodo(newArr);
-
         }
+
+        setColumns((column) => {
+            return newObj
+        })
     }
 
-    // console.log(baseData)
 
-
-
-    console.log(objData)
-
-    // return (
-    //     <div className="task-block">
-    //         <div className="task-block-top mb-20">
-    //             <textarea className="task-block-title" defaultValue="To Do"></textarea>
-    //             <Dropdown className="dd-button">
-    //                 <Dropdown.Toggle id="dropdown-basic" className="dropdown-toggle-custom" >
-    //                     <FontAwesomeIcon icon={faEllipsis} />
-    //                 </Dropdown.Toggle>
-
-    //                 <Dropdown.Menu>
-    //                     <Dropdown.Item href="#/action-1">Action</Dropdown.Item>
-    //                     <Dropdown.Item href="#/action-2">Another action</Dropdown.Item>
-    //                     <Dropdown.Item href="#/action-3">Something else</Dropdown.Item>
-    //                 </Dropdown.Menu>
-    //             </Dropdown>
-    //         </div>
-    //         <div className="task-block-main mb-20">
-    //             <ul>
-    //                 {
-    //                     listTodo.map((item, index) => {
-    //                         return (
-    //                             <ListItem
-    //                                 key={item._id}
-    //                                 id={item._id}
-    //                                 data={listTodo}
-    //                                 obj={item}
-    //                                 name={item.title}
-    //                                 onEdit={handleEdit}
-    //                                 onDelete={handleDelete} />
-    //                         )
-    //                     })
-    //                 }
-    //             </ul>
-    //         </div>
-
-    //         <div className="task-block-action">
-
-    //             {isClickAddd &&
-    //                 <div className="task-block-content">
-    //                     <textarea className="task-block-title" onChange={e => handleChange(e.target.value)} placeholder="Write content in here..."></textarea>
-    //                     <div className="group-btn">
-    //                         <button className="task-block-action-add" onClick={HandleSave}>
-    //                             <FontAwesomeIcon icon={faPlus} />
-    //                             <span>Save</span>
-    //                         </button>
-    //                         <button className="task-block-action-add" onClick={handeCancel}>
-    //                             <FontAwesomeIcon icon={faXmark} />
-    //                             <span>Cancel</span>
-    //                         </button>
-    //                     </div>
-
-    //                 </div>
-    //             }
-
-    //             {!isClickAddd &&
-    //                 <button className="task-block-action-add" onClick={handeAdd}>
-
-    //                     <FontAwesomeIcon icon={faPlus} />
-    //                     <span>Add a card</span>
-    //                 </button>}
-    //         </div>
-    //     </div >
-    // );
-
-
-
+    console.log(columns);
     return (
 
         <div style={{ display: "flex", justifyContent: "center", height: "100%" }}>
@@ -409,6 +413,7 @@ export default function TaskBlock(props) {
                                                                                 name={item.title}
                                                                                 onEdit={handleEdit}
                                                                                 onDelete={handleDelete}
+                                                                                columnDetail={column}
                                                                             />
 
 
@@ -431,7 +436,7 @@ export default function TaskBlock(props) {
                                     <div className="task-block-content">
                                         <textarea className="task-block-title" onChange={e => handleChange(e.target.value)} placeholder="Write content in here..."></textarea>
                                         <div className="group-btn">
-                                            <button className="task-block-action-add" onClick={HandleSave}>
+                                            <button className="task-block-action-add" onClick={(e) => HandleSave(e, column)}>
                                                 <FontAwesomeIcon icon={faPlus} />
                                                 <span>Save</span>
                                             </button>

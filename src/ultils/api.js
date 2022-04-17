@@ -40,20 +40,18 @@ export async function patch(path, body) {
 
 
 export async function deleteItem(path, body) {
+    const res = await axios.delete(apiUrl + path,
+        {
+            headers: {
+                "Authorization": `Bearer ${getToken()}`,
+                "Content-Type": `application/json`
+            },
+            data: {
+                id : body.id
+            }
+        }).then(response => {
+            console.log(response);
+        });
 
-    const res = await axios.delete(apiUrl + path, {
-        headers: {
-            "Authorization": `Bearer ${getToken()}`,
-        }
-    }, body);
-
-    // const res = axios({
-    //     method: 'delete',
-    //     url: apiUrl + path,
-    //     headers: { "Authorization": `Bearer ${getToken()}` },
-    //     data: {
-    //         id: body
-    //     }
-    // })
-    return res.data;
+    return res;
 }
