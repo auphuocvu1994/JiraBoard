@@ -80,7 +80,7 @@ export default function TaskBlock(props) {
 
         const initialValue = JSON.parse(localStorage.getItem("baseData"));
 
-        return  initialValue || baseData;
+        return initialValue || baseData;
     });
 
     //Add
@@ -123,42 +123,46 @@ export default function TaskBlock(props) {
 
     //Get data from API
     useEffect(async () => {
-        const lstToDo = await getTask({
-            status: "todo"
-        })
+        const objDataStorage = JSON.parse(localStorage.getItem("baseData"));
+        console.log(objDataStorage)
+        if (objDataStorage == null ||
+            objDataStorage[Object.keys(objDataStorage)[0]].items.length !== columns[Object.keys(columns)[0]].items.length
+            || objDataStorage[Object.keys(objDataStorage)[1]].items.length !== columns[Object.keys(columns)[1]].items.length
+            || objDataStorage[Object.keys(objDataStorage)[2]].items.length !== columns[Object.keys(columns)[2]].items.length) {
+            console.log("get data cal API")
 
-        columns[Object.keys(columns)[0]].items = lstToDo;
+            const lstToDo = await getTask({
+                status: "todo"
+            })
 
-        const lstIpro = await getTask({
-            status: "in_progress"
-        })
+            columns[Object.keys(columns)[0]].items = lstToDo;
 
-        columns[Object.keys(columns)[1]].items = lstIpro;
+            const lstIpro = await getTask({
+                status: "in_progress"
+            })
 
-
-        const lstDone = await getTask({
-            status: "done"
-        })
-
-        columns[Object.keys(columns)[2]].items = lstDone;
+            columns[Object.keys(columns)[1]].items = lstIpro;
 
 
-        const newObj = { ...columns }
+            const lstDone = await getTask({
+                status: "done"
+            })
 
-        
-        setColumns((column) => {
-            localStorage.setItem("baseData", JSON.stringify(newObj));
-            return newObj
-        })
+            columns[Object.keys(columns)[2]].items = lstDone;
 
-        
 
+            const newObj = { ...columns }
+
+
+            setColumns((column) => {
+                localStorage.setItem("baseData", JSON.stringify(newObj));
+                return newObj
+            })
+        }
     }, [])
 
 
     const onDragEnd = (result, columns, setColumns) => {
-
-        console.log(result)
 
 
         if (!result.destination) return;
@@ -172,6 +176,13 @@ export default function TaskBlock(props) {
             const [removed] = sourceItems.splice(source.index, 1);
             destItems.splice(destination.index, 0, removed);
 
+            destItems.map((value) => {
+                if (value._id === draggableId) {
+                    value.status = destination.droppableId
+                }
+                return 1
+            })
+
             const newColumn = {
                 ...columns,
                 [source.droppableId]: {
@@ -184,22 +195,22 @@ export default function TaskBlock(props) {
                 }
             }
 
+            console.log(destItems)
+
+
             setColumns(() => {
+
+
+                console.log(newColumn)
+
                 localStorage.setItem("baseData", JSON.stringify(newColumn));
+
+
+
                 return newColumn
             });
 
-            console.log({
-                ...columns,
-                [source.droppableId]: {
-                    ...sourceColumn,
-                    items: sourceItems
-                },
-                [destination.droppableId]: {
-                    ...destColumn,
-                    items: destItems
-                }
-            })
+
 
             editTask({
                 id: draggableId,

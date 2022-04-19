@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Formik, Field } from 'formik';
 // import * as EmailValidator from "email-validator";
 import * as Yup from "yup";
@@ -6,6 +6,18 @@ import './style.css';
 import axios from "axios"; //Sử dụng axios
 import { useNavigate } from "react-router";
 import { Spinner } from 'react-bootstrap';
+// Importing toastify module
+import { toast } from 'react-toastify';
+
+// Import toastify css file
+import 'react-toastify/dist/ReactToastify.css';
+
+// toast-configuration method,
+// it is compulsory method.
+toast.configure()
+
+
+
 
 const apiUrl = "https://todo-nodemy.herokuapp.com/user";
 
@@ -13,6 +25,8 @@ const apiUrl = "https://todo-nodemy.herokuapp.com/user";
 function Login() {
 
   const navigate = useNavigate();
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isShowOnFocus, setIsShowOnFocus] = useState(false);
 
   return (
     <Formik
@@ -21,20 +35,31 @@ function Login() {
         password: ""
       }}
 
+
       onSubmit={(input) => {
+        setIsSubmitting(() => {
+          return true
+        })
+
         console.log(input);
+
         axios.post(`${apiUrl}/login`, input)
           .then(response => {
             const token = response.data.token;
-
             console.log(token);
-
             localStorage.setItem('auth', token);
-
             navigate('/Home')
           }
           )
-          .catch((err) => console.log(err));
+          .catch((err) => {
+            console.log(err)
+            setIsSubmitting(false)
+
+            toast.error('username or password is incorrect', {
+              // Set to 15sec
+              position: toast.POSITION.TOP_RIGHT, autoClose: 3000
+            })
+          });
       }
       }
 
@@ -60,13 +85,19 @@ function Login() {
             values,
             touched,
             errors,
-            isSubmitting,
+
             handleChange,
-            handleBlur,
             handleSubmit
           } = props;
 
-
+          function handleBlur(value) {
+            console.log(1)
+            if (value.length > 0) {
+              setIsShowOnFocus(true)
+            }else{
+              setIsShowOnFocus(false)
+            }
+          }
           return (
             <div className="form-register">
               <form onSubmit={handleSubmit}>
@@ -78,7 +109,7 @@ function Login() {
                     type="text"
                     value={values.username}
                     onChange={handleChange}
-                    onBlur={handleBlur}
+                    onBlur={() => handleBlur(values.username)}
                   // className={errors.email && touched.email && "error"}
                   />
                   <label className="form-block__input--title" >Username</label>
@@ -108,7 +139,7 @@ function Login() {
 
                 </div>
                 <button className="btn-login" type="submit" disabled={isSubmitting}>
-                    <span>Login</span>
+                  <span>Login</span>
                   {isSubmitting && <Spinner animation="border" role="status">
                   </Spinner>}
                 </button>
