@@ -5,7 +5,7 @@ import { faEllipsis, faPlus, faXmark } from '@fortawesome/free-solid-svg-icons';
 import { Dropdown, Button, Modal } from 'react-bootstrap';
 import { createTask, removeTask, editTask, getTask } from "../../service/ActionTask";
 import { DragDropContext, Draggable, Droppable } from "react-beautiful-dnd";
-
+import _ from "lodash"; // cool kids know _ is low-dash
 
 //list item 
 function ListItem(props) {
@@ -54,20 +54,25 @@ function ListItem(props) {
     );
 }
 
+const TODO = 'todo';
+const IN_PROGRESS = 'in_progress';
+const DONE = 'done';
+
+
 const baseData = {
-    todo: {
+    [TODO]: {
         name: "To do",
         items: [],
         isShow: false,
         title: "todo"
     },
-    in_progress: {
+    [IN_PROGRESS]: {
         name: "In Progress",
         items: [],
         isShow: false,
         title: "in_progress"
     },
-    done: {
+    [DONE]: {
         name: "Done",
         items: [],
         isShow: false,
@@ -96,9 +101,7 @@ export default function TaskBlock(props) {
             }
         })
 
-        setColumns((column) => {
-            return newObj
-        })
+        setColumns(newObj)
     }
 
     const handeCancel = (column) => {
@@ -112,9 +115,7 @@ export default function TaskBlock(props) {
 
         })
 
-        setColumns((column) => {
-            return newObj
-        })
+        setColumns(newObj)
     }
 
     const handleChange = (e) => {
@@ -123,48 +124,67 @@ export default function TaskBlock(props) {
 
     //Get data from API
     useEffect(async () => {
-        const objDataStorage = JSON.parse(localStorage.getItem("baseData"));
-        console.log(objDataStorage)
-        if (objDataStorage == null ||
-            objDataStorage[Object.keys(objDataStorage)[0]].items.length !== columns[Object.keys(columns)[0]].items.length
-            || objDataStorage[Object.keys(objDataStorage)[1]].items.length !== columns[Object.keys(columns)[1]].items.length
-            || objDataStorage[Object.keys(objDataStorage)[2]].items.length !== columns[Object.keys(columns)[2]].items.length) {
+        // const objDataStorage = JSON.parse(localStorage.getItem("baseData"));
+
+        const newColumn = _.cloneDeep(columns)
+        const cacheColumn = JSON.parse(localStorage.getItem("baseData"));
+
+
+        console.log(newColumn)
+
+        if (cacheColumn == null ||
+            cacheColumn[TODO].items.length !== newColumn[TODO].items.length
+            || cacheColumn[IN_PROGRESS].items.length !== newColumn[IN_PROGRESS].items.length
+            || cacheColumn[DONE].items.length !== newColumn[DONE].items.length) {
             console.log("get data cal API")
 
-            const lstToDo = await getTask({
-                status: "todo"
-            })
-
-            columns[Object.keys(columns)[0]].items = lstToDo;
-
-            const lstIpro = await getTask({
-                status: "in_progress"
-            })
-
-            columns[Object.keys(columns)[1]].items = lstIpro;
+            newColumn[TODO].items = []
+            newColumn[IN_PROGRESS].items = []
+            newColumn[DONE].items = []
 
 
-            const lstDone = await getTask({
-                status: "done"
-            })
+            getTask().then(data => {
+                _.forEach((data, task) => {
+                    newColumn(task.status).items.push(task)
+                })
+            }).finally(() => {
+                localStorage.setItem("baseData", JSON.stringify(newColumn));
+                setColumns(newColumn)
+            }
+            )
 
-            columns[Object.keys(columns)[2]].items = lstDone;
+            // const lstToDo = await getTask({
+            //     status: "todo"
+            // })
+
+            // columns[Object.keys(columns)[0]].items = lstToDo;
+
+            // const lstIpro = await getTask({
+            //     status: "in_progress"
+            // })
+
+            // columns[Object.keys(columns)[1]].items = lstIpro;
 
 
-            const newObj = { ...columns }
+            // const lstDone = await getTask({
+            //     status: "done"
+            // })
+
+            // columns[Object.keys(columns)[2]].items = lstDone;
 
 
-            setColumns((column) => {
-                localStorage.setItem("baseData", JSON.stringify(newObj));
-                return newObj
-            })
+            // const newObj = { ...columns }
+
+
+            // setColumns((column) => {
+            //     localStorage.setItem("baseData", JSON.stringify(newObj));
+            //     return newObj
+            // })
         }
     }, [])
 
 
     const onDragEnd = (result, columns, setColumns) => {
-
-
         if (!result.destination) return;
         const { source, destination, draggableId } = result;
 
@@ -195,22 +215,9 @@ export default function TaskBlock(props) {
                 }
             }
 
-            console.log(destItems)
 
-
-            setColumns(() => {
-
-
-                console.log(newColumn)
-
-                localStorage.setItem("baseData", JSON.stringify(newColumn));
-
-
-
-                return newColumn
-            });
-
-
+            localStorage.setItem("baseData", JSON.stringify(newColumn));
+            setColumns(newColumn);
 
             editTask({
                 id: draggableId,
@@ -233,10 +240,8 @@ export default function TaskBlock(props) {
                 }
             }
 
-            setColumns(() => {
-                localStorage.setItem("baseData", JSON.stringify(newColumn));
-                return newColumn
-            });
+            localStorage.setItem("baseData", JSON.stringify(newColumn));
+            setColumns(newColumn);
 
         }
 
@@ -257,10 +262,7 @@ export default function TaskBlock(props) {
 
         newObj[column.title].items = [...list, newTask]
 
-        setColumns((column) => {
-            return newObj
-        })
-
+        setColumns(newObj);
     }
 
     //Delete
@@ -285,9 +287,7 @@ export default function TaskBlock(props) {
             })
         }
 
-        setColumns((column) => {
-            return newObj
-        })
+        setColumns(newObj)
 
 
         // var arrayCopy = [...listTodo];
@@ -337,9 +337,7 @@ export default function TaskBlock(props) {
             })
         }
 
-        setColumns((column) => {
-            return newObj
-        })
+        setColumns(newObj)
     }
 
 
