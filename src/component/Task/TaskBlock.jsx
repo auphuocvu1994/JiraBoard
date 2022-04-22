@@ -130,8 +130,6 @@ export default function TaskBlock(props) {
         const cacheColumn = JSON.parse(localStorage.getItem("baseData"));
 
 
-        console.log(newColumn)
-
         if (cacheColumn == null ||
             cacheColumn[TODO].items.length !== newColumn[TODO].items.length
             || cacheColumn[IN_PROGRESS].items.length !== newColumn[IN_PROGRESS].items.length
@@ -142,45 +140,19 @@ export default function TaskBlock(props) {
             newColumn[IN_PROGRESS].items = []
             newColumn[DONE].items = []
 
-
             getTask().then(data => {
-                _.forEach((data, task) => {
-                    newColumn(task.status).items.push(task)
+                _.forEach(data, (task) => {
+                    newColumn[task.status].items.push(task)
                 })
+
             }).finally(() => {
                 localStorage.setItem("baseData", JSON.stringify(newColumn));
                 setColumns(newColumn)
             }
             )
 
-            // const lstToDo = await getTask({
-            //     status: "todo"
-            // })
-
-            // columns[Object.keys(columns)[0]].items = lstToDo;
-
-            // const lstIpro = await getTask({
-            //     status: "in_progress"
-            // })
-
-            // columns[Object.keys(columns)[1]].items = lstIpro;
-
-
-            // const lstDone = await getTask({
-            //     status: "done"
-            // })
-
-            // columns[Object.keys(columns)[2]].items = lstDone;
-
-
-            // const newObj = { ...columns }
-
-
-            // setColumns((column) => {
-            //     localStorage.setItem("baseData", JSON.stringify(newObj));
-            //     return newObj
-            // })
         }
+
     }, [])
 
 

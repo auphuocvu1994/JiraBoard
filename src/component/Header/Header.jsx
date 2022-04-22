@@ -1,16 +1,25 @@
-import React from "react";
+import React, { useState } from "react";
 import './style.css';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBars, faMagnifyingGlass, faCircleInfo, faBell, faRightFromBracket } from '@fortawesome/free-solid-svg-icons';
 import { Form } from "react-bootstrap";
 import { useNavigate } from "react-router";
+//Lấy ra state và dispatch từ store
+import { useStore } from "../../store";
 
 export default function Header(props) {
     const navigate = useNavigate();
+    const [txtContent, setTxtContent] = useState();
 
     const handleLogout = () => {
         localStorage.clear();
         navigate('/')
+    }
+
+    const handleChange = (e) => {
+        setTxtContent(e, () => {
+
+        })
     }
 
     return (
@@ -29,7 +38,7 @@ export default function Header(props) {
                         <span className="search-box-ic">
                             <FontAwesomeIcon icon={faMagnifyingGlass} />
                         </span>
-                        <Form.Control type="text" placeholder="Search" />
+                        <Form.Control onChange={e => handleChange(e.target.value)} type="text" placeholder="Search" />
                     </Form.Group>
                 </div>
 

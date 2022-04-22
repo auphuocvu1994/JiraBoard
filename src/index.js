@@ -11,6 +11,8 @@ import { toast } from 'react-toastify';
 // Import toastify css file
 import 'react-toastify/dist/ReactToastify.css';
 
+import { StoreProvider } from './store'
+
 // toast-configuration method,
 // it is compulsory method.
 toast.configure()
@@ -18,7 +20,9 @@ toast.configure()
 ReactDOM.render(
   <React.StrictMode>
     <BrowserRouter>
-      <App />
+      <StoreProvider>
+        <App />
+      </StoreProvider>
     </BrowserRouter>
   </React.StrictMode>,
   document.getElementById('root')
