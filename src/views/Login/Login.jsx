@@ -92,9 +92,9 @@ function Login() {
           function handleBlur(value) {
             console.log(1)
             if (value.length > 0) {
-              setIsShowOnFocus(true)
-            }else{
-              setIsShowOnFocus(false)
+              return true
+            } else {
+              return false
             }
           }
           return (
@@ -108,11 +108,11 @@ function Login() {
                     type="text"
                     value={values.username}
                     onChange={handleChange}
-                    onBlur={() => handleBlur(values.username)}
+                    // onBlur={() => handleBlur(values.username)}
                   // className={errors.email && touched.email && "error"}
                   />
-                  <label className="form-block__input--title" >Username</label>
-                  <label className="form-block__input--border"></label>
+                  <label className={`form-block__input--title ${handleBlur(values.username) ? 'active' : ''}`} >Username</label>
+                  <label className={`form-block__input--border`}></label>
                   <small className="lblError"></small>
                   {errors.username && touched.username && (
                     <div className="input-feedback">{errors.username}</div>
@@ -126,10 +126,10 @@ function Login() {
                     type="password"
                     value={values.password}
                     onChange={handleChange}
-                    onBlur={handleBlur}
+                    // onBlur={handleBlur}
                   // className={errors.password && touched.password && "error"}
                   />
-                  <label className="form-block__input--title" >Password</label>
+                  <label className={`form-block__input--title ${handleBlur(values.password) ? 'active' : ''}`} >Password</label>
                   <label className="form-block__input--border"></label>
                   <small className="lblError"></small>
                   {errors.password && touched.password && (

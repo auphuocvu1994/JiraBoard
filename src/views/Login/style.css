@@ -66,6 +66,13 @@ input.form-block__input:focus + label.form-block__input--title {
     font-size: 14px;
     opacity: 1;
 }
+input.form-block__input + label.form-block__input--title.active {
+    top: -20px;
+    left: -10px;
+    color: #252525;
+    font-size: 14px;
+    opacity: 1;
+}
 /* input.form-block__input.show + label.form-block__input--title {
     top: -20px;
     left: -10px;
