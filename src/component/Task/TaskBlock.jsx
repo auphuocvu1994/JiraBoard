@@ -10,7 +10,7 @@ import _ from "lodash"; // cool kids know _ is low-dash
 //list item 
 function ListItem(props) {
     const handleShow = () => setShow(true);
-    const { id, obj, name, onEdit, onDelete, columnDetail } = props;
+    const { obj, name, onEdit, onDelete } = props;
 
     const [show, setShow] = useState(false);
     const handleClose = () => setShow(false);
@@ -31,7 +31,7 @@ function ListItem(props) {
         <Fragment>
             <li onClick={handleShow}>
                 <span>{name}</span>
-                <a className="task-block-action-edit" onClick={(e) => onDelete(obj, e)}>
+                <a href="/#" className="task-block-action-edit" onClick={(e) => onDelete(obj, e)}>
                     <FontAwesomeIcon icon={faXmark} />
                 </a>
             </li>
@@ -394,7 +394,6 @@ export default function TaskBlock(props) {
                                                                                 name={item.title}
                                                                                 onEdit={handleEdit}
                                                                                 onDelete={handleDelete}
-                                                                                columnDetail={column}
                                                                             />
 
 

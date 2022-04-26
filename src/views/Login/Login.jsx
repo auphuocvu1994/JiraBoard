@@ -25,7 +25,6 @@ function Login() {
 
   const navigate = useNavigate();
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isShowOnFocus, setIsShowOnFocus] = useState(false);
 
   return (
     <Formik

@@ -1,6 +1,6 @@
 const initState = {
-    todos: [],
-    todoInput: ''
+    todos: [1,2,3],
+    todoInput: '1231'
 }
 
 

@@ -59,3 +59,19 @@ export const getTask = async (data) => {
         console.error('error', error.message)
     }
 }
+
+
+/**
+ * 
+ * @param {*} data {key}
+ */
+
+export const searchTask = async (data) => {
+    try {
+        const result = await get('/tasks',data)
+
+        return result
+    } catch (error) {
+        console.error('error', error.message)
+    }
+}
